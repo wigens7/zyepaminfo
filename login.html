@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYEPAM INFO - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0047AB;
+            --bg: #F4F7F9;
+            --card: #FFFFFF;
+            --text: #1A1A1A;
+            --danger: #d32f2f;
+            --success: #2e7d32;
+            --warning: #f57c00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .login-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .lang-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .lang-select {
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-weight: bold;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .admin-container {
+            display: none;
+            width: 90%;
+            max-width: 950px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn-logout {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-back {
+            background: #666;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .loading-spinner {
+            display: none;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section-box {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .section-box h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .badge-active { background-color: var(--success); }
+        .badge-blocked { background-color: var(--danger); }
+
+        .btn-action {
+            padding: 5px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .btn-toggle { background: var(--warning); }
+        .btn-delete { background: var(--danger); }
+        .btn-gen { background: #5c6bc0; margin-top: 5px; }
+
+        .gen-group {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAJ KONEKSYON -->
+    <div class="login-card" id="loginCard">
+        <div class="lang-container">
+            <select class="langSelect lang-select">
+                <option value="ht">HT</option>
+                <option value="fr">FR</option>
+                <option value="en">EN</option>
+            </select>
+        </div>
+
+        <h2><i class="fas fa-lock"></i> <span data-key="title_login">Connexion Admin</span></h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username" data-key="lbl_user">Non Itilizatè (Username)</label>
+                <input type="text" id="username" placeholder="wigens7" required>
+            </div>
+            <div class="form-group">
+                <label for="password" data-key="lbl_pass">Modpas (Password)</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-submit" data-key="btn_login">Konekte</button>
+            <p class="error-msg" id="errorMsg" data-key="err_login">Username oswa Modpas pa bon!</p>
+        </form>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> <span data-key="btn_back">Retounen sou Sit la</span></a>
+        </div>
+    </div>
+
+    <!-- PANÈL ADMIN -->
+    <div class="admin-container" id="adminPanel">
+        <div class="lang-container" style="top: 25px; right: 25px;">
+            <select class="langSelect lang-select">
+                <option value="ht">HT</option>
+                <option value="fr">FR</option>
+                <option value="en">EN</option>
+            </select>
+        </div>
+
+        <div class="admin-header">
+            <h2><i class="fas fa-user-shield"></i> <span id="userRoleTitle">Panèl Admin</span></h2>
+            <div style="margin-right: 60px;">
+                <a href="index.html" class="btn-back"><i class="fas fa-globe"></i> <span data-key="btn_site">Gade Sit la</span></a>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-key="btn_logout">Dekonekte</span></button>
+            </div>
+        </div>
+
+        <!-- 1. POSTE YON ATIK (Sipòte pou tou de Super Admin ak Jounalis) -->
+        <div class="section-box">
+            <h3 data-key="post_title"><i class="fas fa-pen"></i> Poste yon Nouvo Atik</h3>
+            <form id="postForm">
+                <div class="form-group">
+                    <label data-key="lbl_post_title">Tit Nouvèl la</label>
+                    <input type="text" id="postTitle" placeholder="..." required>
+                </div>
+                <div class="form-group">
+                    <label data-key="lbl_post_cat">Kategori</label>
+                    <select id="postCategory" required>
+                        <option value="politik">Politik</option>
+                        <option value="ekonomi">Ekonomi</option>
+                        <option value="espo">Espò</option>
+                        <option value="teknoloji">Teknoloji</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="lbl_post_img">Chwazi Foto nan Aparèy la</label>
+                    <input type="file" id="postImgFile" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="lbl_post_content">Kontni Atik la</label>
+                    <textarea id="postContent" rows="5" placeholder="..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="submitBtn" style="background: var(--success);">
+                    <i class="fas fa-spinner loading-spinner" id="spinner"></i>
+                    <i class="fas fa-plus" id="plusIcon"></i>
+                    <span id="btnText" data-key="btn_publish">Pibliye sou Sit la</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- 2. KONTWÒL ATIK YO (SÈLMAN SUPER ADMIN KI KA BLACKLIST/KACHE AK EFASYON) -->
+        <div class="section-box" id="articlesManagementSection">
+            <h3><i class="fas fa-newspaper"></i> <span data-key="title_manage_posts">Jere Atik Yo (Blacklist / Kache)</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th data-key="th_title">Tit</th>
+                        <th data-key="th_author">Otè</th>
+                        <th data-key="th_status">Statut</th>
+                        <th id="thActionHead" data-key="th_action">Aksyon</th>
+                    </tr>
+                </thead>
+                <tbody id="articlesTableBody">
+                    <!-- Atik yo ap chaje la a -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 3. JERE JOUNALIS YO (SÈLMAN SUPER ADMIN) -->
+        <div class="section-box" id="journalistManagementSection">
+            <h3><i class="fas fa-users-cog"></i> <span data-key="title_manage_journalists">Jere Jounalis Yo (Kreye Kont)</span></h3>
+            <form id="journalistForm" style="margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label data-key="lbl_j_name">Non Jounalis la</label>
+                        <input type="text" id="jName" placeholder="Jean Paul" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-key="lbl_j_user">Username</label>
+                        <input type="text" id="jUser" placeholder="jpaul" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-key="lbl_j_pass">Modpas</label>
+                    <div class="gen-group">
+                        <input type="text" id="jPass" placeholder="Modpas..." required>
+                        <button type="button" class="btn-action btn-gen" id="genPassBtn" data-key="btn_gen">Jenere Modpas</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" style="background: var(--primary);"><i class="fas fa-user-plus"></i> <span data-key="btn_add_j">Kreye Kont Jounalis</span></button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th data-key="th_name">Non</th>
+                        <th data-key="th_user">Username</th>
+                        <th data-key="th_pass">Modpas</th>
+                        <th data-key="th_action">Aksyon</th>
+                    </tr>
+                </thead>
+                <tbody id="journalistsTableBody">
+                    <!-- Jounalis yo ap chaje la a -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // KLE API IMGBB PAW LA
+        const IMGBB_API_KEY = "92141aa7827bf48df9f7652e06dad0dc";
+
+        const i18n = {
+            ht: {
+                title_login: "Connexion Admin",
+                lbl_user: "Non Itilizatè (Username)",
+                lbl_pass: "Modpas (Password)",
+                btn_login: "Konekte",
+                err_login: "Username oswa Modpas pa bon!",
+                btn_back: "Retounen sou Sit la",
+                btn_site: "Gade Sit la",
+                btn_logout: "Dekonekte",
+                post_title: "Poste yon Nouvo Atik",
+                lbl_post_title: "Tit Nouvèl la",
+                lbl_post_cat: "Kategori",
+                lbl_post_img: "Chwazi Foto nan Aparèy la",
+                lbl_post_content: "Kontni Atik la",
+                btn_publish: "Pibliye sou Sit la",
+                uploading: "N ap monte imaj la...",
+                success_msg: "Atik la pibliye ak siksè sou sit prensipal la!",
+                error_img: "Erè nan monte imaj la. Vérifye si fichye a se yon imaj ki valid.",
+                title_manage_posts: "Jere Atik Yo (Blacklist / Kache)",
+                th_title: "Tit",
+                th_author: "Otè",
+                th_status: "Statut",
+                th_action: "Aksyon",
+                title_manage_journalists: "Jere Jounalis Yo (Kreye Kont)",
+                lbl_j_name: "Non Jounalis la",
+                lbl_j_user: "Username",
+                lbl_j_pass: "Modpas",
+                btn_gen: "Jenere Modpas",
+                btn_add_j: "Kreye Kont Jounalis",
+                th_name: "Non",
+                th_user: "Username",
+                th_pass: "Modpas",
+                st_visible: "Piblik",
+                st_hidden: "Kache (Blacklisted)",
+                act_hide: "Kache",
+                act_show: "Mete Piblik",
+                no_access: "Aksyon entèdi pou Jounalis"
+            },
+            fr: {
+                title_login: "Connexion Admin",
+                lbl_user: "Nom d'utilisateur",
+                lbl_pass: "Mot de passe",
+                btn_login: "Se connecter",
+                err_login: "Nom d'utilisateur ou mot de passe incorrect!",
+                btn_back: "Retour au site",
+                btn_site: "Voir le site",
+                btn_logout: "Déconnexion",
+                post_title: "Publier un nouvel article",
+                lbl_post_title: "Titre de l'article",
+                lbl_post_cat: "Catégorie",
+                lbl_post_img: "Sélectionner une image",
+                lbl_post_content: "Contenu de l'article",
+                btn_publish: "Publier sur le site",
+                uploading: "Téléchargement de l'image...",
+                success_msg: "L'article a été publié avec succès sur le site principal!",
+                error_img: "Erreur lors du téléchargement de l'image. Vérifiez votre fichier.",
+                title_manage_posts: "Gérer les articles (Blacklist / Masquer)",
+                th_title: "Titre",
+                th_author: "Auteur",
+                th_status: "Statut",
+                th_action: "Action",
+                title_manage_journalists: "Gérer les journalistes (Créer un compte)",
+                lbl_j_name: "Nom du journaliste",
+                lbl_j_user: "Nom d'utilisateur",
+                lbl_j_pass: "Mot de passe",
+                btn_gen: "Générer mot de passe",
+                btn_add_j: "Créer un compte",
+                th_name: "Nom",
+                th_user: "Nom d'utilisateur",
+                th_pass: "Mot de passe",
+                st_visible: "Public",
+                st_hidden: "Masqué (Blacklisted)",
+                act_hide: "Masquer",
+                act_show: "Rendre Public",
+                no_access: "Action interdite aux journalistes"
+            },
+            en: {
+                title_login: "Admin Login",
+                lbl_user: "Username",
+                lbl_pass: "Password",
+                btn_login: "Login",
+                err_login: "Incorrect username or password!",
+                btn_back: "Back to website",
+                btn_site: "View website",
+                btn_logout: "Logout",
+                post_title: "Post a New Article",
+                lbl_post_title: "Article Title",
+                lbl_post_cat: "Category",
+                lbl_post_img: "Select Image from Device",
+                lbl_post_content: "Article Content",
+                btn_publish: "Publish to Website",
+                uploading: "Uploading image...",
+                success_msg: "Article published successfully to the main site!",
+                error_img: "Error uploading image. Please check your image file.",
+                title_manage_posts: "Manage Articles (Blacklist / Hide)",
+                th_title: "Title",
+                th_author: "Author",
+                th_status: "Status",
+                th_action: "Action",
+                title_manage_journalists: "Manage Journalists (Create Account)",
+                lbl_j_name: "Journalist Name",
+                lbl_j_user: "Username",
+                lbl_j_pass: "Password",
+                btn_gen: "Generate Password",
+                btn_add_j: "Create Account",
+                th_name: "Name",
+                th_user: "Username",
+                th_pass: "Password",
+                st_visible: "Public",
+                st_hidden: "Hidden (Blacklisted)",
+                act_hide: "Hide",
+                act_show: "Make Public",
+                no_access: "Action restricted for Journalists"
+            }
+        };
+
+        let currentLang = localStorage.getItem('appLang') || 'ht';
+
+        function updateLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('appLang', lang);
+            document.querySelectorAll('.langSelect').forEach(s => s.value = lang);
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (i18n[lang][key]) {
+                    elem.textContent = i18n[lang][key];
+                }
+            });
+            renderArticlesTable();
+            renderJournalistsTable();
+        }
+
+        const loginForm = document.getElementById('loginForm');
+        const loginCard = document.getElementById('loginCard');
+        const adminPanel = document.getElementById('adminPanel');
+        const errorMsg = document.getElementById('errorMsg');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const journalistSection = document.getElementById('journalistManagementSection');
+        const userRoleTitle = document.getElementById('userRoleTitle');
+
+        function checkSession() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if(currentUser) {
+                loginCard.style.display = 'none';
+                adminPanel.style.display = 'block';
+
+                if(currentUser.role === 'superadmin') {
+                    userRoleTitle.textContent = "Panèl Super Admin (" + currentUser.name + ")";
+                    journalistSection.style.display = 'block';
+                } else {
+                    userRoleTitle.textContent = "Panèl Jounalis (" + currentUser.name + ")";
+                    journalistSection.style.display = 'none';
+                }
+                renderArticlesTable();
+                renderJournalistsTable();
+            } else {
+                loginCard.style.display = 'block';
+                adminPanel.style.display = 'none';
+            }
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
+            // 1. VERIFYE SUPER ADMIN PREMYE POU PA SOUFRIN AK NENPÒT JOUNALIS
+            if (user === 'wigens7' && pass === 'WIGGYpromo@123') {
+                const superAdminUser = { name: 'Wigens', username: 'wigens7', role: 'superadmin' };
+                localStorage.setItem('currentUser', JSON.stringify(superAdminUser));
+                errorMsg.style.display = 'none';
+                loginForm.reset();
+                checkSession();
+                return;
+            }
+
+            // 2. SI SE PA SUPER ADMIN, WE NENPÒT JOUNALIS KREYE
+            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
+            const foundJ = journalists.find(j => j.username.toLowerCase() === user.toLowerCase() && j.password === pass);
+
+            if(foundJ) {
+                const jUser = { name: foundJ.name, username: foundJ.username, role: 'journalist' };
+                localStorage.setItem('currentUser', JSON.stringify(jUser));
+                errorMsg.style.display = 'none';
+                loginForm.reset();
+                checkSession();
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            checkSession();
+        });
+
+        // JENERE MODPAS OTOMATIK POU JOUNALIS
+        document.getElementById('genPassBtn').addEventListener('click', () => {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+            let pass = "";
+            for(let i=0; i<8; i++){
+                pass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('jPass').value = pass;
+        });
+
+        // KREYE YON NOUVO JOUNALIS
+        document.getElementById('journalistForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('jName').value.trim();
+            const username = document.getElementById('jUser').value.trim();
+            const password = document.getElementById('jPass').value.trim();
+
+            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
+
+            // Empêcher kreye yon jounalis ki pote "wigens7" kòm username
+            if(username.toLowerCase() === 'wigens7') {
+                alert("Username sa a se pou Super Admin an sèlman!");
+                return;
+            }
+
+            journalists.push({ id: Date.now(), name, username, password });
+            localStorage.setItem('appJournalists', JSON.stringify(journalists));
+
+            e.target.reset();
+            renderJournalistsTable();
+        });
+
+        function renderJournalistsTable() {
+            const tbody = document.getElementById('journalistsTableBody');
+            tbody.innerHTML = '';
+            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
+
+            journalists.forEach(j => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${j.name}</td>
+                    <td>${j.username}</td>
+                    <td><code>${j.password}</code></td>
+                    <td>
+                        <button class="btn-action btn-delete" onclick="deleteJournalist(${j.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.deleteJournalist = function(id) {
+            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
+            journalists = journalists.filter(j => j.id !== id);
+            localStorage.setItem('appJournalists', JSON.stringify(journalists));
+            renderJournalistsTable();
+        };
+
+        // MONTE FOTO SOU IMGBB
+        async function uploadImageToImgBB(file) {
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                return data.data.url;
+            } else {
+                throw new Error("Upload failed");
+            }
+        }
+
+        // POSTE YON ATIK
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('spinner');
+            const plusIcon = document.getElementById('plusIcon');
+            const btnText = document.getElementById('btnText');
+            const imageFile = document.getElementById('postImgFile').files[0];
+
+            if (!imageFile) return;
+
+            submitBtn.disabled = true;
+            spinner.style.display = "inline-block";
+            plusIcon.style.display = "none";
+            btnText.textContent = i18n[currentLang].uploading;
+
+            try {
+                const imageUrl = await uploadImageToImgBB(imageFile);
+
+                const newArticle = {
+                    id: Date.now(),
+                    title: document.getElementById('postTitle').value,
+                    category: document.getElementById('postCategory').value,
+                    date: new Date().toLocaleDateString('ht-HT', { day: 'numeric', month: 'long', year: 'numeric' }),
+                    image: imageUrl,
+                    excerpt: document.getElementById('postContent').value.substring(0, 80) + '...',
+                    content: document.getElementById('postContent').value,
+                    author: currentUser.name,
+                    isBlacklisted: false
+                };
+
+                let storedArticles = JSON.parse(localStorage.getItem('customArticles')) || [];
+                storedArticles.unshift(newArticle);
+                localStorage.setItem('customArticles', JSON.stringify(storedArticles));
+
+                alert(i18n[currentLang].success_msg);
+                e.target.reset();
+                renderArticlesTable();
+
+            } catch (err) {
+                alert(i18n[currentLang].error_img);
+            } finally {
+                submitBtn.disabled = false;
+                spinner.style.display = "none";
+                plusIcon.style.display = "inline-block";
+                btnText.textContent = i18n[currentLang].btn_publish;
+            }
+        });
+
+        // JERE ATIK YO (SÈLMAN SUPER ADMIN KI GEN BOUTON SOU ACTION YO)
+        function renderArticlesTable() {
+            const tbody = document.getElementById('articlesTableBody');
+            tbody.innerHTML = '';
+            let articles = JSON.parse(localStorage.getItem('customArticles')) || [];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
+
+            articles.forEach(art => {
+                const tr = document.createElement('tr');
+                const isHidden = art.isBlacklisted;
+
+                let actionContent = '';
+                if(isSuperAdmin) {
+                    actionContent = `
+                        <button class="btn-action btn-toggle" onclick="toggleBlacklist(${art.id})">
+                            ${isHidden ? i18n[currentLang].act_show : i18n[currentLang].act_hide}
+                        </button>
+                        <button class="btn-action btn-delete" onclick="deleteArticle(${art.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                } else {
+                    actionContent = `<em style="color:#888; font-size: 0.8rem;">${i18n[currentLang].no_access}</em>`;
+                }
+
+                tr.innerHTML = `
+                    <td>${art.title}</td>
+                    <td>${art.author || 'Wigens'}</td>
+                    <td>
+                        <span class="badge ${isHidden ? 'badge-blocked' : 'badge-active'}">
+                            ${isHidden ? i18n[currentLang].st_hidden : i18n[currentLang].st_visible}
+                        </span>
+                    </td>
+                    <td>${actionContent}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.toggleBlacklist = function(id) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if(!currentUser || currentUser.role !== 'superadmin') {
+                alert("Sèl Super Admin ki gen dwa kache oswa mete yon atik piblik!");
+                return;
+            }
+
+            let articles = JSON.parse(localStorage.getItem('customArticles')) || [];
+            articles = articles.map(art => {
+                if (art.id === id) {
+                    art.isBlacklisted = !art.isBlacklisted;
+                }
+                return art;
+            });
+            localStorage.setItem('customArticles', JSON.stringify(articles));
+            renderArticlesTable();
+        };
+
+        window.deleteArticle = function(id) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if(!currentUser || currentUser.role !== 'superadmin') {
+                alert("Sèl Super Admin ki gen dwa siprime yon atik!");
+                return;
+            }
+
+            let articles = JSON.parse(localStorage.getItem('customArticles')) || [];
+            articles = articles.filter(art => art.id !== id);
+            localStorage.setItem('customArticles', JSON.stringify(articles));
+            renderArticlesTable();
+        };
+
+        document.querySelectorAll('.langSelect').forEach(select => {
+            select.addEventListener('change', (e) => {
+                updateLanguage(e.target.value);
+            });
+        });
+
+        checkSession();
+        updateLanguage(currentLang);
+    </script>
+</body>
+</html>
