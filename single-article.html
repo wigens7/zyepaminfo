@@ -149,100 +149,52 @@
 
     <script>
         const defaultArticles = [
-            {
-                id: 1,
-                title: "Foot- Sélection : Ricardo Adé annonce sa retraite internationale",
-                category: "Espò",
-                author: "Wigens",
-                date: "7 Septanm 2026",
-                image: "https://picsum.photos/600/400?random=1",
-                content: "Ricardo Adé anonsé fòmèlman ke li pran retrèt li nan ekip nasyonal la. Yon gwo paj nan foutbòl ayisyen an ki vire jodi a. Li mèsi tout sipòtè yo ak tout moun ki te soutni l pandan tout karyè li ak ekip nasyonal la."
-            },
-            {
-                id: 2,
-                title: "Foot - LDF : Jamesley Daniel s'offre un doublé dans la rencontre",
-                category: "Espò",
-                author: "Wigens",
-                date: "7 Septanm 2026",
-                image: "https://picsum.photos/600/400?random=2",
-                content: "Bèl pèfòmans pou Jamesley Daniel ki make 2 gòl nan dènye matche li a. Ekip li a genyen matche sa a ak yon gwo avantaj gras ak talan ak vitès li sou teren an."
-            },
-            {
-                id: 3,
-                title: "Foot Fém : Zénith Saint-Pétersbourg l'emporte, Shwendesky Joseph...",
-                category: "Espò",
-                author: "Wigens",
-                date: "7 Septanm 2026",
-                image: "https://picsum.photos/600/400?random=3",
-                content: "Jwez ayisyèn nan Shwendesky Joseph tounen yon gwo aksyon nan viktwa ekip li a san okenn efò anplis. Li kontinye ap briye nan nivo entènasyonal."
-            },
-            {
-                id: 4,
-                title: "Foot : La sélection U17 reprend des couleurs ak gwo viktwa",
-                category: "Espò",
-                author: "Wigens",
-                date: "7 Septanm 2026",
-                image: "https://picsum.photos/600/400?random=4",
-                content: "Ekip seleksyon U17 la fè yon gwo remonte nan konpetisyon an kote yo ranpòte yon gwo viktwa ki ba yo konfyans pou pwochen matche yo."
-            },
-            {
-                id: 5,
-                title: "Foot- Sélection: David Badía: « J'aime un football attractif et rapide »",
-                category: "Espò",
-                author: "Wigens",
-                date: "7 Septanm 2026",
-                image: "https://picsum.photos/600/400?random=5",
-                content: "Antrenè a pataje vizyon l pou ekip la kote li eksplike kalite jwèt li ta renmen devlope sou teren an pou l ka bay plis rezilta ak plis plezi pou fanatik yo."
-            }
+            {id:1,title:"Foot- Sélection : Ricardo Adé annonce sa retraite internationale",category:"Espò",author:"Wigens",date:"7 Septanm 2026",image:"https://picsum.photos/600/400?random=1",content:"Ricardo Adé anonsé fòmèlman ke li pran retrèt li nan ekip nasyonal la. Yon gwo paj nan foutbòl ayisyen an ki vire jodi a. Li mèsi tout sipòtè yo ak tout moun ki te soutni l pandan tout karyè li ak ekip nasyonal la."},
+            {id:2,title:"Foot - LDF : Jamesley Daniel s'offre un doublé dans la rencontre",category:"Espò",author:"Wigens",date:"7 Septanm 2026",image:"https://picsum.photos/600/400?random=2",content:"Bèl pèfòmans pou Jamesley Daniel ki make 2 gòl nan dènye matche li a. Ekip li a genyen matche sa a ak yon gwo avantaj gras ak talan ak vitès li sou teren an."},
+            {id:3,title:"Foot Fém : Zénith Saint-Pétersbourg l'emporte, Shwendesky Joseph...",category:"Espò",author:"Wigens",date:"7 Septanm 2026",image:"https://picsum.photos/600/400?random=3",content:"Jwez ayisyèn nan Shwendesky Joseph kontinye briye nan nivo entènasyonal."},
+            {id:4,title:"Foot : La sélection U17 reprend des couleurs ak gwo viktwa",category:"Espò",author:"Wigens",date:"7 Septanm 2026",image:"https://picsum.photos/600/400?random=4",content:"Ekip seleksyon U17 la fè yon gwo remonte nan konpetisyon an kote yo ranpòte yon gwo viktwa."},
+            {id:5,title:"Foot- Sélection: David Badía: « J'aime un football attractif et rapide »",category:"Espò",author:"Wigens",date:"7 Septanm 2026",image:"https://picsum.photos/600/400?random=5",content:"Antrenè a pataje vizyon l pou ekip la kote li eksplike kalite jwèt li ta renmen devlope sou teren an."},
+            [101,"Foot - D1 : Arcahaie FC annonce son retour...","Childo Geffrard"],
+            [102,"D1: Ernso Datus prend les commandes de l'AS Capoise","Gary Eliézer"],
+            [103,"Foot - Amical : Violette AC domine Salcedo FC","Douby Jean"],
+            [104,"Jeux d'Am. centrale et des Caraïbes : Jessica Lee...","Childo Geffrard"],
+            [105,"MJSAC : Une journée Sport-Santé pour promouvoir le bien-être...","Childo Geffrard"],
+            [106,"Salou Youth Cup : Jacot Football Passion en route...","Gary Eliézer"],
+            [107,"MJSAC : Wilfince Mombrun, nouveau directeur général","Childo Geffrard"],
+            [108,"Foot - LHF : Le FICA connaît son sort","Douby Jean"]
         ];
-
-        // Atik paj prensipal la (id 101-108) pou lyen yo pa bay erè
-        [
-            [101, "Foot - D1 : Arcahaie FC annonce son retour...", "Childo Geffrard"],
-            [102, "D1: Ernso Datus prend les commandes de l'AS Capoise", "Gary Eliézer"],
-            [103, "Foot - Amical : Violette AC domine Salcedo FC", "Douby Jean"],
-            [104, "Jeux d'Am. centrale et des Caraïbes : Jessica Lee...", "Childo Geffrard"],
-            [105, "MJSAC : Une journée Sport-Santé pour promouvoir le bien-être...", "Childo Geffrard"],
-            [106, "Salou Youth Cup : Jacot Football Passion en route...", "Gary Eliézer"],
-            [107, "MJSAC : Wilfince Mombrun, nouveau directeur général", "Childo Geffrard"],
-            [108, "Foot - LHF : Le FICA connaît son sort", "Douby Jean"]
-        ].forEach(([id, title, author]) => defaultArticles.push({
-            id, title, author, category: "Espò", date: "Jodi a",
-            image: `https://picsum.photos/600/400?random=${id - 90}`,
-            content: "Plis detay sou nouvèl sa a ap pibliye byento sou ZYEPAM INFO."
-        }));
-
-        function getArticleIdFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            return parseInt(params.get('id'));
-        }
-
-        function loadArticle() {
-            const articleId = getArticleIdFromUrl();
-            let customArticles = JSON.parse(localStorage.getItem('customArticles')) || [];
-            let allArticles = [...customArticles, ...defaultArticles];
-
-            const article = allArticles.find(a => a.id === articleId);
-
-            const detailContainer = document.getElementById('articleDetail');
-
-            if (article) {
-                detailContainer.innerHTML = `
-                    <span class="article-cat">${article.category || 'Nouvèl'}</span>
-                    <h1 class="article-title">${article.title}</h1>
-                    <div class="article-meta">
-                        <span><i class="fas fa-user"></i> ${article.author || 'Medyatè'}</span>
-                        <span><i class="fas fa-calendar"></i> ${article.date || 'Jodi a'}</span>
-                    </div>
-                    <img src="${article.image}" alt="${article.title}" class="article-img">
-                    <div class="article-body">${article.content || article.excerpt || 'Pa gen plis kontni pou atik sa a.'}</div>
-                `;
-            } else {
-                detailContainer.innerHTML = `<h2>Erè: Atik sa a pa egziste oswa li te efase.</h2><br><a href="index.html" class="btn-back">Retounen nan Paj Akèy la</a>`;
+        const defaultFull = defaultArticles.map(item => Array.isArray(item) ? ({
+            id:item[0], title:item[1], author:item[2], category:'Espò', date:'Jodi a',
+            image:`https://picsum.photos/600/400?random=${item[0]-90}`,
+            content:'Plis detay sou nouvèl sa a ap pibliye byento sou ZYEPAM INFO.'
+        }) : item);
+        async function loadArticle() {
+            const id = Number(new URLSearchParams(location.search).get('id'));
+            const container = document.getElementById('articleDetail');
+            try {
+                const data = await fetch('/api/articles', {credentials:'same-origin'}).then(r => r.json());
+                const custom = data.articles || [];
+                const article = custom.find(a => Number(a.id) === id) || defaultFull.find(a => Number(a.id) === id);
+                if (!article) {
+                    container.textContent = 'Erè: Atik sa a pa egziste oswa li te efase.';
+                    return;
+                }
+                container.replaceChildren();
+                const cat = document.createElement('span'); cat.className='article-cat'; cat.textContent=article.category || 'Nouvèl';
+                const title = document.createElement('h1'); title.className='article-title'; title.textContent=article.title;
+                const meta = document.createElement('div'); meta.className='article-meta';
+                const author = document.createElement('span'); author.textContent='✍ ' + (article.author || 'Medyatè');
+                const date = document.createElement('span'); date.textContent='▦ ' + (article.date ? new Date(article.date).toLocaleDateString() : 'Jodi a');
+                meta.append(author,date);
+                const img = document.createElement('img'); img.className='article-img'; img.alt=article.title;
+                if (/^https:\/\/(?:i\.ibb\.co|ibb\.co|picsum\.photos)\//i.test(article.image || '')) img.src=article.image;
+                const body = document.createElement('div'); body.className='article-body'; body.textContent=article.content || article.excerpt || 'Pa gen plis kontni pou atik sa a.';
+                container.append(cat,title,meta,img,body);
+            } catch {
+                container.textContent = 'Nou pa kapab chaje atik la kounye a. Tanpri eseye ankò.';
             }
         }
-
         loadArticle();
-    </script>
+</script>
 </body>
 </html>

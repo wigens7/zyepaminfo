@@ -370,7 +370,7 @@
                     <tr>
                         <th data-key="th_name">Non</th>
                         <th data-key="th_user">Username</th>
-                        <th data-key="th_pass">Modpas</th>
+                        <th data-key="th_pass">Sekirite</th>
                         <th data-key="th_action">Aksyon</th>
                     </tr>
                 </thead>
@@ -383,9 +383,6 @@
     </div>
 
     <script>
-        // KLE API IMGBB PAW LA
-        const IMGBB_API_KEY = "92141aa7827bf48df9f7652e06dad0dc";
-
         const i18n = {
             ht: {
                 title_login: "Connexion Admin",
@@ -503,22 +500,21 @@
             }
         };
 
+
         let currentLang = localStorage.getItem('appLang') || 'ht';
+        let currentUser = null;
+        let managedArticles = [];
+        let journalists = [];
 
-        function updateLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('appLang', lang);
-            document.querySelectorAll('.langSelect').forEach(s => s.value = lang);
-            document.querySelectorAll('[data-key]').forEach(elem => {
-                const key = elem.getAttribute('data-key');
-                if (i18n[lang][key]) {
-                    elem.textContent = i18n[lang][key];
-                }
+        async function api(url, options = {}) {
+            const response = await fetch(url, { credentials: 'same-origin', ...options,
+                headers: { ...(options.body instanceof FormData ? {} : {'Content-Type':'application/json'}), ...(options.headers || {}) }
             });
-            renderArticlesTable();
-            renderJournalistsTable();
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.error || 'Demann lan pa reyisi.');
+            return data;
         }
-
+        const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
         const loginForm = document.getElementById('loginForm');
         const loginCard = document.getElementById('loginCard');
         const adminPanel = document.getElementById('adminPanel');
@@ -527,268 +523,194 @@
         const journalistSection = document.getElementById('journalistManagementSection');
         const userRoleTitle = document.getElementById('userRoleTitle');
 
-        function checkSession() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if(currentUser) {
+        function updateLanguage(lang) {
+            currentLang = i18n[lang] ? lang : 'ht';
+            localStorage.setItem('appLang', currentLang);
+            document.querySelectorAll('.langSelect').forEach(s => s.value = currentLang);
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (i18n[currentLang][key]) elem.textContent = i18n[currentLang][key];
+            });
+            renderArticlesTable();
+            renderJournalistsTable();
+        }
+
+        async function checkSession() {
+            try {
+                const data = await api('/api/auth/me');
+                currentUser = data.user;
+            } catch { currentUser = null; }
+            if (currentUser) {
                 loginCard.style.display = 'none';
                 adminPanel.style.display = 'block';
-
-                if(currentUser.role === 'superadmin') {
-                    userRoleTitle.textContent = "Panèl Super Admin (" + currentUser.name + ")";
-                    journalistSection.style.display = 'block';
-                } else {
-                    userRoleTitle.textContent = "Panèl Jounalis (" + currentUser.name + ")";
-                    journalistSection.style.display = 'none';
-                }
-                renderArticlesTable();
-                renderJournalistsTable();
+                const isAdmin = currentUser.role === 'superadmin';
+                userRoleTitle.textContent = (isAdmin ? 'Panèl Super Admin (' : 'Panèl Jounalis (') + currentUser.name + ')';
+                journalistSection.style.display = isAdmin ? 'block' : 'none';
+                await refreshManagement();
             } else {
                 loginCard.style.display = 'block';
                 adminPanel.style.display = 'none';
             }
         }
 
-        loginForm.addEventListener('submit', (e) => {
+        async function refreshManagement() {
+            const data = await api('/api/articles/manage');
+            managedArticles = data.articles || [];
+            renderArticlesTable();
+            if (currentUser.role === 'superadmin') {
+                const jData = await api('/api/journalists');
+                journalists = jData.journalists || [];
+                renderJournalistsTable();
+            }
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-
-            // 1. VERIFYE SUPER ADMIN PREMYE POU PA SOUFRIN AK NENPÒT JOUNALIS
-            if (user === 'wigens7' && pass === 'WIGGYpromo@123') {
-                const superAdminUser = { name: 'Wigens', username: 'wigens7', role: 'superadmin' };
-                localStorage.setItem('currentUser', JSON.stringify(superAdminUser));
+            const pass = document.getElementById('password').value;
+            try {
+                await api('/api/auth/login', { method:'POST', body:JSON.stringify({username:user,password:pass}) });
                 errorMsg.style.display = 'none';
                 loginForm.reset();
-                checkSession();
-                return;
-            }
-
-            // 2. SI SE PA SUPER ADMIN, WE NENPÒT JOUNALIS KREYE
-            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
-            const foundJ = journalists.find(j => j.username.toLowerCase() === user.toLowerCase() && j.password === pass);
-
-            if(foundJ) {
-                const jUser = { name: foundJ.name, username: foundJ.username, role: 'journalist' };
-                localStorage.setItem('currentUser', JSON.stringify(jUser));
-                errorMsg.style.display = 'none';
-                loginForm.reset();
-                checkSession();
-            } else {
+                await checkSession();
+            } catch (err) {
+                errorMsg.textContent = err.message;
                 errorMsg.style.display = 'block';
             }
         });
 
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('currentUser');
+        logoutBtn.addEventListener('click', async () => {
+            try { await api('/api/auth/logout', {method:'POST', body:'{}'}); } catch {}
+            currentUser = null;
             checkSession();
         });
 
-        // JENERE MODPAS OTOMATIK POU JOUNALIS
         document.getElementById('genPassBtn').addEventListener('click', () => {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
-            let pass = "";
-            for(let i=0; i<8; i++){
-                pass += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('jPass').value = pass;
+            const bytes = new Uint8Array(18);
+            crypto.getRandomValues(bytes);
+            const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
+            document.getElementById('jPass').value = Array.from(bytes, b => alphabet[b % alphabet.length]).join('');
         });
 
-        // KREYE YON NOUVO JOUNALIS
-        document.getElementById('journalistForm').addEventListener('submit', (e) => {
+        document.getElementById('journalistForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('jName').value.trim();
             const username = document.getElementById('jUser').value.trim();
-            const password = document.getElementById('jPass').value.trim();
-
-            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
-
-            // Empêcher kreye yon jounalis ki pote "wigens7" kòm username
-            if(username.toLowerCase() === 'wigens7') {
-                alert("Username sa a se pou Super Admin an sèlman!");
-                return;
-            }
-
-            journalists.push({ id: Date.now(), name, username, password });
-            localStorage.setItem('appJournalists', JSON.stringify(journalists));
-
-            e.target.reset();
-            renderJournalistsTable();
+            const password = document.getElementById('jPass').value;
+            try {
+                await api('/api/journalists', {method:'POST', body:JSON.stringify({name,username,password})});
+                e.target.reset();
+                await refreshManagement();
+                alert('Kont jounalis la kreye. Kopi modpas la epi remèt li bay jounalis la.');
+            } catch (err) { alert(err.message); }
         });
 
         function renderJournalistsTable() {
             const tbody = document.getElementById('journalistsTableBody');
-            tbody.innerHTML = '';
-            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
-
+            if (!tbody) return;
+            tbody.replaceChildren();
             journalists.forEach(j => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${j.name}</td>
-                    <td>${j.username}</td>
-                    <td><code>${j.password}</code></td>
-                    <td>
-                        <button class="btn-action btn-delete" onclick="deleteJournalist(${j.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                [j.name, j.username, 'Modpas ankripte'].forEach(value => {
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                });
+                const td = document.createElement('td');
+                const btn = document.createElement('button');
+                btn.className = 'btn-action btn-delete';
+                btn.type = 'button';
+                btn.innerHTML = '<i class="fas fa-trash"></i>';
+                btn.title = 'Efase kont';
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Efase kont jounalis sa a?')) return;
+                    try { await api('/api/journalists/' + encodeURIComponent(j.id), {method:'DELETE'}); await refreshManagement(); }
+                    catch (err) { alert(err.message); }
+                });
+                td.appendChild(btn); tr.appendChild(td); tbody.appendChild(tr);
             });
         }
 
-        window.deleteJournalist = function(id) {
-            let journalists = JSON.parse(localStorage.getItem('appJournalists')) || [];
-            journalists = journalists.filter(j => j.id !== id);
-            localStorage.setItem('appJournalists', JSON.stringify(journalists));
-            renderJournalistsTable();
-        };
-
-        // MONTE FOTO SOU IMGBB
-        async function uploadImageToImgBB(file) {
+        async function uploadImageToServer(file) {
             const formData = new FormData();
-            formData.append("image", file);
-
-            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                return data.data.url;
-            } else {
-                throw new Error("Upload failed");
-            }
+            formData.append('image', file);
+            const result = await api('/api/upload-image', {method:'POST', body:formData});
+            return result.url;
         }
 
-        // POSTE YON ATIK
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('spinner');
             const plusIcon = document.getElementById('plusIcon');
             const btnText = document.getElementById('btnText');
             const imageFile = document.getElementById('postImgFile').files[0];
-
-            if (!imageFile) return;
-
+            if (!imageFile) { alert('Chwazi yon imaj.'); return; }
             submitBtn.disabled = true;
-            spinner.style.display = "inline-block";
-            plusIcon.style.display = "none";
+            spinner.style.display = 'inline-block';
+            plusIcon.style.display = 'none';
             btnText.textContent = i18n[currentLang].uploading;
-
             try {
-                const imageUrl = await uploadImageToImgBB(imageFile);
-
-                const newArticle = {
-                    id: Date.now(),
-                    title: document.getElementById('postTitle').value,
-                    category: document.getElementById('postCategory').value,
-                    date: new Date().toLocaleDateString('ht-HT', { day: 'numeric', month: 'long', year: 'numeric' }),
-                    image: imageUrl,
-                    excerpt: document.getElementById('postContent').value.substring(0, 80) + '...',
-                    content: document.getElementById('postContent').value,
-                    author: currentUser.name,
-                    isBlacklisted: false
-                };
-
-                let storedArticles = JSON.parse(localStorage.getItem('customArticles')) || [];
-                storedArticles.unshift(newArticle);
-                localStorage.setItem('customArticles', JSON.stringify(storedArticles));
-
+                const imageUrl = await uploadImageToServer(imageFile);
+                await api('/api/articles', {method:'POST', body:JSON.stringify({
+                    title:document.getElementById('postTitle').value,
+                    category:document.getElementById('postCategory').value,
+                    content:document.getElementById('postContent').value,
+                    image:imageUrl
+                })});
                 alert(i18n[currentLang].success_msg);
                 e.target.reset();
-                renderArticlesTable();
-
-            } catch (err) {
-                alert(i18n[currentLang].error_img);
-            } finally {
+                await refreshManagement();
+            } catch (err) { alert(err.message || i18n[currentLang].error_img); }
+            finally {
                 submitBtn.disabled = false;
-                spinner.style.display = "none";
-                plusIcon.style.display = "inline-block";
+                spinner.style.display = 'none';
+                plusIcon.style.display = 'inline-block';
                 btnText.textContent = i18n[currentLang].btn_publish;
             }
         });
 
-        // JERE ATIK YO (SÈLMAN SUPER ADMIN KI GEN BOUTON SOU ACTION YO)
         function renderArticlesTable() {
             const tbody = document.getElementById('articlesTableBody');
-            tbody.innerHTML = '';
-            let articles = JSON.parse(localStorage.getItem('customArticles')) || [];
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!tbody) return;
+            tbody.replaceChildren();
             const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
-
-            articles.forEach(art => {
+            managedArticles.forEach(art => {
                 const tr = document.createElement('tr');
-                const isHidden = art.isBlacklisted;
-
-                let actionContent = '';
-                if(isSuperAdmin) {
-                    actionContent = `
-                        <button class="btn-action btn-toggle" onclick="toggleBlacklist(${art.id})">
-                            ${isHidden ? i18n[currentLang].act_show : i18n[currentLang].act_hide}
-                        </button>
-                        <button class="btn-action btn-delete" onclick="deleteArticle(${art.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
+                const title = document.createElement('td'); title.textContent = art.title;
+                const author = document.createElement('td'); author.textContent = art.author || 'ZYEPAM';
+                const status = document.createElement('td');
+                const badge = document.createElement('span');
+                badge.className = 'badge ' + (art.isBlacklisted ? 'badge-blocked' : 'badge-active');
+                badge.textContent = art.isBlacklisted ? i18n[currentLang].st_hidden : i18n[currentLang].st_visible;
+                status.appendChild(badge);
+                const action = document.createElement('td');
+                if (isSuperAdmin) {
+                    const toggle = document.createElement('button');
+                    toggle.className = 'btn-action btn-toggle';
+                    toggle.textContent = art.isBlacklisted ? i18n[currentLang].act_show : i18n[currentLang].act_hide;
+                    toggle.addEventListener('click', async () => {
+                        try { await api(`/api/articles/${art.id}/visibility`, {method:'PATCH',body:JSON.stringify({hidden:!art.isBlacklisted})}); await refreshManagement(); }
+                        catch (err) { alert(err.message); }
+                    });
+                    const del = document.createElement('button');
+                    del.className = 'btn-action btn-delete'; del.innerHTML = '<i class="fas fa-trash"></i>';
+                    del.addEventListener('click', async () => {
+                        if (!confirm('Efase atik sa a?')) return;
+                        try { await api('/api/articles/' + art.id, {method:'DELETE'}); await refreshManagement(); }
+                        catch (err) { alert(err.message); }
+                    });
+                    action.append(toggle, del);
                 } else {
-                    actionContent = `<em style="color:#888; font-size: 0.8rem;">${i18n[currentLang].no_access}</em>`;
+                    action.textContent = i18n[currentLang].no_access;
                 }
-
-                tr.innerHTML = `
-                    <td>${art.title}</td>
-                    <td>${art.author || 'Wigens'}</td>
-                    <td>
-                        <span class="badge ${isHidden ? 'badge-blocked' : 'badge-active'}">
-                            ${isHidden ? i18n[currentLang].st_hidden : i18n[currentLang].st_visible}
-                        </span>
-                    </td>
-                    <td>${actionContent}</td>
-                `;
-                tbody.appendChild(tr);
+                tr.append(title, author, status, action); tbody.appendChild(tr);
             });
         }
 
-        window.toggleBlacklist = function(id) {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if(!currentUser || currentUser.role !== 'superadmin') {
-                alert("Sèl Super Admin ki gen dwa kache oswa mete yon atik piblik!");
-                return;
-            }
-
-            let articles = JSON.parse(localStorage.getItem('customArticles')) || [];
-            articles = articles.map(art => {
-                if (art.id === id) {
-                    art.isBlacklisted = !art.isBlacklisted;
-                }
-                return art;
-            });
-            localStorage.setItem('customArticles', JSON.stringify(articles));
-            renderArticlesTable();
-        };
-
-        window.deleteArticle = function(id) {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if(!currentUser || currentUser.role !== 'superadmin') {
-                alert("Sèl Super Admin ki gen dwa siprime yon atik!");
-                return;
-            }
-
-            let articles = JSON.parse(localStorage.getItem('customArticles')) || [];
-            articles = articles.filter(art => art.id !== id);
-            localStorage.setItem('customArticles', JSON.stringify(articles));
-            renderArticlesTable();
-        };
-
-        document.querySelectorAll('.langSelect').forEach(select => {
-            select.addEventListener('change', (e) => {
-                updateLanguage(e.target.value);
-            });
-        });
-
-        checkSession();
+        document.querySelectorAll('.langSelect').forEach(select => select.addEventListener('change', e => updateLanguage(e.target.value)));
+        checkSession().catch(err => { errorMsg.textContent = err.message; errorMsg.style.display = 'block'; });
         updateLanguage(currentLang);
-    </script>
+</script>
 </body>
 </html>
