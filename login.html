@@ -223,6 +223,20 @@
             display: flex;
             gap: 10px;
         }
+
+        @media (max-width: 700px) {
+            body { align-items: flex-start; padding: 16px 12px; }
+            .login-card { margin-top: 24px; padding: 22px; }
+            .admin-container { width: 100%; padding: 16px; margin: 0; }
+            .admin-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .admin-header > div { margin-right: 0 !important; }
+            .admin-container .lang-container { position: static !important; margin-bottom: 10px; }
+            .section-box { padding: 14px; }
+            .section-box table { display: block; overflow-x: auto; white-space: nowrap; }
+            #journalistForm > div { grid-template-columns: 1fr !important; }
+            .gen-group { flex-direction: column; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 16px; }
+        }
     </style>
 </head>
 <body>

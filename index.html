@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0047AB">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
     <title>ZYEPAM INFO - Paj Prensipal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,7 +26,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: inherit;
         }
 
         body {
@@ -506,7 +510,6 @@
         .custom-footer {
             background-color: #1A237E;
             color: #FFFFFF;
-            font-family: 'Segoe UI', Arial, sans-serif;
             margin-top: 50px;
         }
 
@@ -750,6 +753,72 @@
                 text-align: center;
             }
         }
+
+        /* ===== PRO REFRESH (mobile-first polish, desktop preserved) ===== */
+        html { -webkit-text-size-adjust: 100%; }
+        body { font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+        .slide-overlay h2, .national-card-overlay h4 { font-family: 'Source Serif 4', Georgia, serif; font-weight: 700; }
+        a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid #4C8DFF; outline-offset: 2px; }
+        nav { position: sticky; top: 0; z-index: 50; }
+        .nav-container { scrollbar-width: none; }
+        .nav-container::-webkit-scrollbar { display: none; }
+        .left-item { position: relative; }
+        .center-slider-col { touch-action: pan-y; }
+        .slider-track { position: absolute; inset: 0; }
+        .slider-dots { position: absolute; top: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 5; pointer-events: none; }
+        .slider-dots i { width: 6px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.55); transition: width .3s, background .3s; }
+        .slider-dots i.on { width: 18px; background: #fff; }
+        @media (prefers-reduced-motion: reduce) { .scroll-wrapper { animation: none; } .slider-track { transition: none; } }
+
+        @media (max-width: 1024px) {
+            .news-layout-grid { background: none; box-shadow: none; padding: 0; gap: 18px; }
+            .center-slider-col { order: 1; height: auto; aspect-ratio: 16 / 9; border-radius: 14px; }
+            .right-static-col { order: 2; height: auto; overflow: visible; border: 0; padding: 16px; background: var(--white); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.06); }
+            .left-scroll-col { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 10px 14px; }
+            .logo { gap: 8px; }
+            .logo-icon { font-size: 1.4rem; }
+            .logo h1 { font-size: 1.2rem; letter-spacing: .3px; }
+            .header-actions { gap: 8px; }
+            .lang-select { height: 36px; padding: 0 6px; font-size: .8rem; }
+            .login-btn { height: 36px; padding: 0 12px; font-size: .8rem; }
+            .nav-container a { padding: 13px 16px; font-size: .78rem; border-bottom: 3px solid transparent; }
+            .nav-container a:hover, .nav-container a.active { background: transparent; border-bottom-color: #4C8DFF; }
+            .main-container { margin: 14px auto; padding: 0 12px; }
+
+            .center-slider-col { aspect-ratio: 4 / 3; }
+            .slide-overlay { padding: 40px 14px 14px; }
+            .slide-overlay h2 { font-size: 1.15rem; line-height: 1.3; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+            .slider-btn { display: none; }
+            .btn-more { display: inline-flex; align-items: center; min-height: 34px; padding: 0 14px; font-size: .72rem; letter-spacing: .3px; }
+            .share-btn { width: 34px; height: 34px; font-size: .95rem; }
+            .btn-delete-admin { padding: 6px 9px; font-size: .8rem; }
+
+            .right-list li { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; }
+            .right-list li:last-child { border-bottom: 0; }
+            .right-list-item-top { flex: 1; }
+            .right-list a { font-size: .95rem; line-height: 1.4; }
+
+            .national-section { padding: 14px; border-radius: 14px; margin-bottom: 20px; }
+            .national-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .national-subnav { max-width: 100%; overflow-x: auto; white-space: nowrap; gap: 16px; scrollbar-width: none; }
+            .national-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .national-card { height: 200px; border-radius: 10px; }
+            .national-card:first-child { grid-column: 1 / -1; height: 240px; }
+            .national-card-overlay { padding: 10px; }
+            .national-card-overlay h4 { font-size: .9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+            .national-card:first-child h4 { font-size: 1.1rem; }
+            .national-card-overlay .author { display: none; }
+            .national-card-bottom { justify-content: flex-end; }
+
+            .custom-footer { margin-top: 32px; }
+            .footer-top { padding: 32px 16px; }
+            .footer-container > .footer-col:last-child { display: none; }
+            .footer-bottom-links { flex-wrap: wrap; justify-content: center; }
+        }
     </style>
 </head>
 <body>
@@ -861,15 +930,15 @@
                     <div class="footer-title-badge">SÉLECTION DE LA RÉDACTION</div>
                     <div class="footer-articles-list">
                         <a href="single-article.html?id=101" class="footer-article-item">
-                            <img src="https://picsum.photos/600/400?random=11" alt="news">
+                            <img src="https://picsum.photos/600/400?random=11" alt="news" loading="lazy" decoding="async">
                             <span>Foot - D1 : Arcahaie FC annonce son retour...</span>
                         </a>
                         <a href="single-article.html?id=102" class="footer-article-item">
-                            <img src="https://picsum.photos/600/400?random=12" alt="news">
+                            <img src="https://picsum.photos/600/400?random=12" alt="news" loading="lazy" decoding="async">
                             <span>D1: Ernso Datus prend les commandes de l'AS Capoise</span>
                         </a>
                         <a href="single-article.html?id=103" class="footer-article-item">
-                            <img src="https://picsum.photos/600/400?random=13" alt="news">
+                            <img src="https://picsum.photos/600/400?random=13" alt="news" loading="lazy" decoding="async">
                             <span>Foot - Amical : Violette AC domine Salcedo FC</span>
                         </a>
                     </div>
@@ -1010,7 +1079,7 @@
                     <div class="national-card">
                         <button class="btn-delete-admin" onclick="deleteArticle(${art.id}, event)"><i class="fas fa-trash"></i></button>
                         <a href="single-article.html?id=${art.id}" style="display:block; height:100%; text-decoration:none;">
-                            <img src="${art.image}" alt="news">
+                            <img src="${art.image}" alt="news" loading="lazy" decoding="async">
                             <div class="national-card-overlay">
                                 <h4>${art.title}</h4>
                                 <div class="national-card-bottom">
@@ -1034,10 +1103,10 @@
             let html = '';
             articles.forEach(art => {
                 html += `
-                    <div style="position:relative;">
+                    <div class="left-item">
                         <button class="btn-delete-admin" onclick="deleteArticle(${art.id}, event)"><i class="fas fa-trash"></i></button>
                         <a href="single-article.html?id=${art.id}" class="left-card">
-                            <img src="${art.image}" alt="news">
+                            <img src="${art.image}" alt="news" loading="lazy" decoding="async">
                             <div class="left-card-content">
                                 <h4>${art.title}</h4>
                                 <div class="quick-share-group">
@@ -1049,7 +1118,7 @@
                     </div>
                 `;
             });
-            container.innerHTML = html + html;
+            container.innerHTML = html + html.split('class="left-item"').join('class="left-item is-clone" aria-hidden="true"');
         }
 
         function loadCenterSlider() {
@@ -1104,33 +1173,47 @@
 
         function initSlider() {
             const track = document.getElementById('sliderTrack');
-            const slides = document.querySelectorAll('.slide-item');
-            const totalSlides = slides.length;
-            if (totalSlides === 0) return;
+            const col = track.parentElement;
+            const total = track.querySelectorAll('.slide-item').length;
+            if (total === 0) return;
+            if (currentIndex >= total) currentIndex = 0;
 
-            function updateSlider() {
+            let dots = col.querySelector('.slider-dots');
+            if (!dots) {
+                dots = document.createElement('div');
+                dots.className = 'slider-dots';
+                col.appendChild(dots);
+            }
+            dots.innerHTML = '<i></i>'.repeat(total);
+
+            function go(i) {
+                currentIndex = (i + total) % total;
                 track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                dots.querySelectorAll('i').forEach((d, n) => d.classList.toggle('on', n === currentIndex));
             }
 
-            function nextSlide() {
-                currentIndex = (currentIndex + 1) % totalSlides;
-                updateSlider();
-            }
-
-            function prevSlide() {
-                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-                updateSlider();
-            }
-
-            document.getElementById('nextSlide').onclick = () => { nextSlide(); resetInterval(); };
-            document.getElementById('prevSlide').onclick = () => { prevSlide(); resetInterval(); };
-
-            function resetInterval() {
+            function restart() {
                 clearInterval(autoSlideInterval);
-                autoSlideInterval = setInterval(nextSlide, 4500);
+                autoSlideInterval = setInterval(() => go(currentIndex + 1), 4500);
             }
 
-            resetInterval();
+            document.getElementById('nextSlide').onclick = () => { go(currentIndex + 1); restart(); };
+            document.getElementById('prevSlide').onclick = () => { go(currentIndex - 1); restart(); };
+
+            // Swipe sou telefòn
+            let sx = 0, sy = 0;
+            col.ontouchstart = e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; };
+            col.ontouchend = e => {
+                const dx = e.changedTouches[0].clientX - sx;
+                const dy = e.changedTouches[0].clientY - sy;
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                    go(currentIndex + (dx < 0 ? 1 : -1));
+                    restart();
+                }
+            };
+
+            go(currentIndex);
+            restart();
         }
 
         function refreshAllSections() {

@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0047AB">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
     <title>ZYEPAM INFO - Li Atik</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -18,10 +22,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: inherit;
         }
 
         body {
+            font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
             background-color: var(--bg);
             color: var(--text);
             line-height: 1.6;
@@ -112,6 +118,18 @@
             white-space: pre-line;
             line-height: 1.8;
         }
+
+        .article-title, .article-body { font-family: 'Source Serif 4', Georgia, serif; }
+        @media (max-width: 700px) {
+            header { padding: 10px 14px; position: sticky; top: 0; z-index: 20; }
+            .logo h1 { font-size: 1.15rem; }
+            .btn-back { min-height: 36px; padding: 0 12px; font-size: .8rem; }
+            .article-container { margin: 0; padding: 18px 16px 32px; border-radius: 0; box-shadow: none; }
+            .article-title { font-size: 1.45rem; line-height: 1.28; }
+            .article-meta { flex-wrap: wrap; gap: 6px 16px; }
+            .article-img { max-height: none; aspect-ratio: 16 / 10; border-radius: 10px; }
+            .article-body { font-size: 1.05rem; line-height: 1.75; }
+        }
     </style>
 </head>
 <body>
@@ -177,6 +195,22 @@
                 content: "Antrenè a pataje vizyon l pou ekip la kote li eksplike kalite jwèt li ta renmen devlope sou teren an pou l ka bay plis rezilta ak plis plezi pou fanatik yo."
             }
         ];
+
+        // Atik paj prensipal la (id 101-108) pou lyen yo pa bay erè
+        [
+            [101, "Foot - D1 : Arcahaie FC annonce son retour...", "Childo Geffrard"],
+            [102, "D1: Ernso Datus prend les commandes de l'AS Capoise", "Gary Eliézer"],
+            [103, "Foot - Amical : Violette AC domine Salcedo FC", "Douby Jean"],
+            [104, "Jeux d'Am. centrale et des Caraïbes : Jessica Lee...", "Childo Geffrard"],
+            [105, "MJSAC : Une journée Sport-Santé pour promouvoir le bien-être...", "Childo Geffrard"],
+            [106, "Salou Youth Cup : Jacot Football Passion en route...", "Gary Eliézer"],
+            [107, "MJSAC : Wilfince Mombrun, nouveau directeur général", "Childo Geffrard"],
+            [108, "Foot - LHF : Le FICA connaît son sort", "Douby Jean"]
+        ].forEach(([id, title, author]) => defaultArticles.push({
+            id, title, author, category: "Espò", date: "Jodi a",
+            image: `https://picsum.photos/600/400?random=${id - 90}`,
+            content: "Plis detay sou nouvèl sa a ap pibliye byento sou ZYEPAM INFO."
+        }));
 
         function getArticleIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
